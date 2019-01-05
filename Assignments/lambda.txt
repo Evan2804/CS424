@@ -1,0 +1,177 @@
+Part 1:
+kons = λ a d z . z false a d => (lambda a (lambda d (lambda z . ((((z false) a) d)))))
+kar = λ p . p (λ n a d . a) => (lambda p . (p ((lambda d (lambda a (lambda d . a))))))
+kdr = λ p . p (λ n a d . d) => (lambda p . (p ((lambda d (lambda a (lambda d . d))))))
+null = λ z . z true false false => (lambda z . (()))
+null$ = λ p . p (λ n a d . n) => (lambda p . (p ((lambda d (lambda a (lambda d . n))))))
+true = λ a b . a => (lambda a (lambda b . a))
+false = λ a b . b => (lambda a (lambda b . b))
+
+Proofs:
+
+kar (kons e1 e2 ) => e1
+expand kons => λ a d z . z false a d
+expand kar => λ p . p (λ n a d . a)
+(λ p . p (λ n a d . a)) ((λ a d z . z false a d) e1 e2)
+β-reduction: [a:= e1]
+(λ p . p (λ n a d . a)) ((λ z . z false e1 d) e2)
+β-reduction: [d:= e2]
+(λ p . p (λ n a d . a)) (λ z . z false e1 e2)
+β-reduction: [p:= (λ z . z false e1 e2)]
+(λ z . z false e1 e2) (λ n a d . a)
+β-reduction: [z:= (λ n a d . a)]
+(λ n a d . a) false e1 e2
+β-reduction: [n:= false]
+(λ a d . a) e1 e2
+β-reduction: [a:= e1]
+(λ d . e1) e2
+β-reduction: [d:= e2]
+(e1)
+e1
+
+--------------------------------------
+kdr (kons e1 e2 ) => e2
+expand kons => λ a d z . z false a d
+expand kdr => λ p . p (λ n a d . d)
+(λ p . p (λ n a d . d)) ((λ a d z . z false a d) e1 e2)
+β-reduction: [a:= e1]
+(λ p . p (λ n a d . d)) ((λ z . z false e1 d) e2)
+β-reduction: [d:= e2]
+(λ p . p (λ n a d . d)) (λ z . z false e1 e2)
+β-reduction: [p:= (λ z . z false e1 e2)]
+(λ z . z false e1 e2) (λ n a d . d)
+β-reduction: [z:= (λ n a d . d)]
+(λ n a d . d) false e1 e2
+β-reduction: [n:= false]
+(λ a d . d) e1 e2
+β-reduction: [a:= e1]
+(λ d . d) e2
+β-reduction: [d:= e2]
+(e2)
+e2
+
+--------------------------------------
+null$ (kons e1 e2 ) => false
+expand kons => λ a d z . z false a d
+expand null$ => λ p . p (λ n a d . n)
+(λ p . p (λ n a d . n)) ((λ a d z . z false a d) e1 e2)
+β-reduction: [a:= e1]
+(λ p . p (λ n a d . n)) ((λ z . z false e1 d) e2)
+β-reduction: [d:= e2]
+(λ p . p (λ n a d . n)) (λ z . z false e1 e2)
+β-reduction: [p:= (λ z . z false e1 e2)]
+(λ z . z false e1 e2) (λ n a d . n)
+β-reduction: [z:= (λ n a d . n)]
+(λ n a d . n) false e1 e2
+β-reduction: [n:= false]
+(λ a d . false) e1 e2
+β-reduction: [a:= e1]
+(λ d . false)e2
+β-reduction: [d:= e2]
+(false)
+false
+
+--------------------------------------
+null$ null => true
+expand null = λ z . z true false false
+expand null$ = λ p . p (λ n a d . n)
+(λ p . p (λ n a d . n)) (λ z . z true false false)
+β-reduction: [p:= (λ z . z true false false)]
+(λ z . z true false false) (λ n a d . n)
+β-reduction: [z:= (λ n a d . n)]
+(λ n a d . n) true false false
+β-reduction: [n:= true]
+(λ a d . true) false false
+β-reduction: [n:= true]
+(λ d . true) false
+β-reduction: [n:= true]
+(true)
+true
+
+
+======================================
+
+
+Part 2:
+
+(λ c . (λ a . (λ d . (λ h . (h (d (a (a (λ z y . y))) (d (a (a (λ f x . x))) (a (a (a (λ z x . x)))))) (h (a (a (λ z y . y))) (a (a (a (λ z x . x))))))) (λ n m . n (d m) (λ z y . y))) (λ n m . n a m)) (λ n z . c (n z) z)) (λ z g x . z (g x))
+
+=== (λ z g x . z (g x)) reduces to => (λ z g . z) => true
+(λ c . (λ a . (λ d . (λ h . (h (d (a (a (λ z y . y))) (d (a (a (λ f x . x))) (a (a (a (λ z x . x)))))) (h (a (a (λ z y . y))) (a (a (a (λ z x . x))))))) (λ n m . n (d m) (λ z y . y))) (λ n m . n a m)) (λ n z . c (n z) z)) true
+
+== β-reduction [c:=true]
+(λ a . (λ d . (λ h . (h (d (a (a (λ z y . y))) (d (a (a (λ f x . x))) (a (a (a (λ z x . x)))))) (h (a (a (λ z y . y))) (a (a (a (λ z x . x))))))) (λ n m . n (d m) (λ z y . y))) (λ n m . n a m)) (λ n z . true (n z) z)
+
+== Changing λ z y . y => false
+== Changing λ f x . x => false
+== Changing λ z x . x => false
+(λ a . (λ d . (λ h . (h (d (a (a (false))) (d (a (a (false))) (a (a (a (false)))))) (h (a (a (false))) (a (a (a (false))))))) (λ n m . n (d m) (false))) (λ n m . n a m)) (λ n z . true (n z) z)
+
+== β-reduction [(λ n z . true (n z) z):=(λ n . true z)]
+(λ a . (λ d . (λ h . (h (d (a (a (false))) (d (a (a (false))) (a (a (a (false)))))) (h (a (a (false))) (a (a (a (false))))))) (λ n m . n (d m) (false))) (λ n m . n a m)) (λ n . true z)
+
+== β-reduction [a:=(λ n . true z)]
+(λ d . (λ h . (h (d ((λ n . true z) ((λ n . true z) (false))) (d ((λ n . true z) ((λ n . true z) (false))) ((λ n . true z) ((λ n . true z) ((λ n . true z) (false)))))) (h ((λ n . true z) ((λ n . true z) (false))) ((λ n . true z) ((λ n . true z) ((λ n . true z) (false))))))) (λ n m . n (d m) (false))) (λ n m . n (λ n . true z) m)
+
+== β-reduction [(λ n . true z) m :=(true z)]
+(λ d . (λ h . (h (d ((λ n . true z) ((λ n . true z) (false))) (d ((λ n . true z) ((λ n . true z) (false))) ((λ n . true z) ((λ n . true z) ((λ n . true z) (false)))))) (h ((λ n . true z) ((λ n . true z) (false))) ((λ n . true z) ((λ n . true z) ((λ n . true z) (false))))))) (λ n m . n (d m) (false))) (λ n m . n (true z))
+
+== β-reduction [((λ n . true z) (false)) := (true z)]
+(λ d . (λ h . (h (d ((λ n . true z) (true z)) (d ((λ n . true z) (true z)) ((λ n . true z) ((λ n . true z) (true z))))) (h ((λ n . true z) (true z)) ((λ n . true z) ((λ n . true z) (true z)))))) (λ n m . n (d m) (false))) (λ n m . n (true z))
+
+== β-reduction [(λ n m . n (true z)) := (λ n . n)]
+(λ d . (λ h . (h (d ((λ n . true z) (true z)) (d ((λ n . true z) (true z)) ((λ n . true z) ((λ n . true z) (true z))))) (h ((λ n . true z) (true z)) ((λ n . true z) ((λ n . true z) (true z)))))) (λ n m . n (d m) (false))) (λ n . n)
+
+== β-reduction [d := (λ n . n)]
+(λ h . (h ((λ n . n) ((λ n . true z) (true z)) ((λ n . n) ((λ n . true z) (true z)) ((λ n . true z) ((λ n . true z) (true z))))) (h ((λ n . true z) (true z)) ((λ n . true z) ((λ n . true z) (true z)))))) (λ n m . n ((λ n . n) m) (false))
+
+== β-reduction [(λ n . n) m := (m)]
+(λ h . (h ((λ n . n) ((λ n . true z) (true z)) ((λ n . n) ((λ n . true z) (true z)) ((λ n . true z) ((λ n . true z) (true z))))) (h ((λ n . true z) (true z)) ((λ n . true z) ((λ n . true z) (true z)))))) (λ n m . n (m) (false))
+
+== β-reduction [(λ n m . n (m) (false)) := (false)]
+(λ h . (h ((λ n . n) ((λ n . true z) (true z)) ((λ n . n) ((λ n . true z) (true z)) ((λ n . true z) ((λ n . true z) (true z))))) (h ((λ n . true z) (true z)) ((λ n . true z) ((λ n . true z) (true z)))))) (false)
+
+== β-reduction [((λ n . true z) (true z)) := (true z)]
+(λ h . (h ((λ n . n) (true z) ((λ n . n) (true z) ((λ n . true z) (true z)))) (h (true z) ((λ n . true z) (true z))))) (false)
+
+== β-reduction [((λ n . true z) (true z)) := (true z)]
+(λ h . (h ((λ n . n) (true z) ((λ n . n) (true z) (true z))) (h (true z) (true z)))) (false)
+
+== β-reduction [(λ n . n) (true z) := (true z)]
+(λ h . (h ((true z) ((true z) (true z))) (h (true z) (true z)))) (false)
+
+== β-reduction [h := (false)]
+((false) ((true z) ((true z) (true z))) ((false) (true z) (true z)))
+
+== replace true => (λ x y . x)
+(false) (((λ x y . x) z) (((λ x y . x) z) ((λ x y . x) z))) ((false) ((λ x y . x) z) ((λ x y . x) z))
+
+== β-reduction [x := z]
+(false) ((λ y . z) ((λ y . z) (λ y . z))) ((false) (λ y . z) (λ y . z))
+
+== α-conversion [y := a]
+== α-conversion [y := b]
+== α-conversion [y := c]
+== α-conversion [y := d]
+(false) ((λ a . z) ((λ b . z) (λ c . z))) ((false) (λ d . z) (λ y . z))
+
+== β-reduction [((λ b . z) (λ c . z)) := z]
+(false) ((λ a . z) z) ((false) (λ d . z) (λ y . z))
+
+== β-reduction [(λ d . z) (λ y . z) := z]
+(false) ((λ a . z) z) ((false) z)
+
+== β-reduction [((λ a . z) z) := z]
+(false) z ((false) z)
+
+== replace false = (λ a b . b)
+(λ a b . b) z ((λ a b . b) z)
+
+== replace false = (λ a b . b)
+(λ a b . b) z ((λ a b . b) z)
+
+== β-reduction [(λ a b . b) z := (λ b . b)]
+(λ b . b) (λ b . b)
+
+== β-reduction [(λ b . b) (λ b . b) := (λ b . b)]
+(λ b . b)

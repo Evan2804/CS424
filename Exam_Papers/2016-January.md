@@ -33,10 +33,20 @@ Define a Haskell function weaveHunks which takes an int and two lists and weaves
 
 #### Answer:
 ``` Haskell
-revCount p q = (\x y -> replicate (last y) (charToString (last x)) 
-                ++ if (null (tail x) /= True || null (tail y) /= True) 
-                    then (revCount (take(length x-1)x) (take(length y-1)y)) else []) p q
+revCount p q
+    | (null p) = []
+    | (null q) = p
+    | otherwise = revCount (tail p) (tail q) ++ (replicate (head q) (head p))
 ```
+
+##### Or
+``` Haskell
+revCount p q
+    | (null p) = []
+    | (null q) = p
+    | otherwise = revCount (tail p) (tail q) ++ (take (head q) (repeat (head p)))
+```
+
 
 #### Example:
 ``` Haskell

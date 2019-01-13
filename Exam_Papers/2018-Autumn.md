@@ -7,34 +7,12 @@ every other element of the given list, starting with the first element.
 
 #### Answer:
 ``` Scheme
-(define (odds lst)
-  (cond
-    ((null? lst) '())
-    ((null? (cdr lst)) '())
-    (else
-     (cons (car lst)
-           (odds (cddr lst))))))
-
-(define (evens lst)
-  (cond
-    ((null? lst) '())
-    ((null? (cdr lst)) '())
-    (else
-     (cons (cadr lst)
-           (evens (cddr lst))))))
-
-(define (merge l1 l2)
-  (cond
-    ((null? l1) l2)
-    ((null? l2) l1)
-    (else
-     (cons (car l1)
-           (cons (car l2)
-                 (merge (cdr l1) (cdr l2)))))))
-
 (define (map-skip p lst)
-  (merge
-   (map p (odds lst)) (evens lst)))
+  (cond
+    ((null? lst) '())
+    ((null? (cdr lst)) (map p (lst)))
+    (else
+     (append (map p (list (car lst))) (cons (cadr lst) (map-skip p (cddr lst)))))))
 ```
 
 #### Example:
@@ -49,7 +27,10 @@ Define a Haskell function mapSkip which takes a function and a list and returns 
 
 #### Answer:
 ``` Haskell
-mapSkip p x = map(\a -> if (odd a) then (p a) else a) x
+mapSkip p l1
+    | (null l1) = []
+    | (null (tail l1)) = (map p l1)
+    | otherwise = p (head l1) : (head (tail l1)) :(mapSkip p (tail (tail l1)))
 ```
 #### Example:
 ``` Haskell
@@ -69,3 +50,6 @@ scissors([H|T],S,[Xh|Xt],Y) :- H \= S, H == Xh, scissors(T,S,Xt,Y).
 ``` Prolog
 scissors([a,b,c,d,e,f],c,[a,b],[d,e,f]). => true. 
 ```
+<!--stackedit_data:
+eyJoaXN0b3J5IjpbMzY4MDk5MjkzXX0=
+-->
